@@ -24,9 +24,9 @@ public enum SocketError: Error {
 
 open class Socket: Hashable, Equatable {
         
-    let socketFileDescriptor: Int32
+    public let socketFileDescriptor: Int32
     private var shutdown = false
-
+    public var didClose: (() -> ())?
     
     public init(socketFileDescriptor: Int32) {
         self.socketFileDescriptor = socketFileDescriptor
@@ -42,6 +42,8 @@ open class Socket: Hashable, Equatable {
         if shutdown {
             return
         }
+        
+        didClose?()
         shutdown = true
         Socket.close(self.socketFileDescriptor)
     }

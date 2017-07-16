@@ -141,6 +141,8 @@ public class WebSocketSession: Hashable, Equatable  {
     public enum OpCode: UInt8 { case `continue` = 0x00, close = 0x08, ping = 0x09, pong = 0x0A, text = 0x01, binary = 0x02 }
     public enum Control: Error { case close }
     
+    public var shouldCloseSocket = true
+    
     public class Frame {
         public var opcode = OpCode.close
         public var fin = false
@@ -157,8 +159,10 @@ public class WebSocketSession: Hashable, Equatable  {
     }
     
     deinit {
-        writeCloseFrame()
-        socket.close()
+        if shouldCloseSocket {
+            writeCloseFrame()
+            socket.close()
+        }
     }
     
     public func writeText(_ text: String) -> Void {
